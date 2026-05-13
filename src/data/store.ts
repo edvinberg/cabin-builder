@@ -25,6 +25,29 @@ function id() {
   return `gen-${nextId++}`;
 }
 
+// Firebase strips empty arrays and may convert arrays to objects with numeric keys
+function toArray<T>(val: unknown): T[] {
+  if (!val) return [];
+  if (Array.isArray(val)) return val;
+  return Object.values(val);
+}
+
+function normalizePhase(p: any): Phase {
+  return { ...p, steps: toArray(p.steps), materials: toArray(p.materials), notes: toArray(p.notes), links: toArray(p.links), images: toArray(p.images) };
+}
+
+function normalizeProject(p: any): Project {
+  return { ...p, phases: toArray(p.phases).map(normalizePhase), images: toArray(p.images) };
+}
+
+function normalizeState(data: any): { projects: Project[]; learnings: Learning[]; nextId: number } {
+  return {
+    projects: toArray(data.projects).map(normalizeProject),
+    learnings: toArray(data.learnings),
+    nextId: data.nextId ?? 1000,
+  };
+}
+
 function emit() {
   const state = { projects, learnings, nextId };
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
@@ -40,9 +63,10 @@ onValue(stateRef, (snapshot) => {
   }
   const data = snapshot.val();
   if (!data) return;
-  projects = data.projects ?? [];
-  learnings = data.learnings ?? [];
-  nextId = data.nextId ?? nextId;
+  const normalized = normalizeState(data);
+  projects = normalized.projects;
+  learnings = normalized.learnings;
+  nextId = normalized.nextId;
   localStorage.setItem(STORAGE_KEY, JSON.stringify({ projects, learnings, nextId }));
   listeners.forEach((l) => l());
 });
