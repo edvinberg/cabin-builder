@@ -1,20 +1,35 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ChevronRight, Trash2, Plus } from "lucide-react";
+import { ChevronRight, Trash2, Plus, Download } from "lucide-react";
 import { useProjects, deleteProject, updateProject, cycleProjectStatus } from "../data/store";
 import { StatusBadge } from "../components/StatusBadge";
 import { EditableText } from "../components/EditableText";
 import { TemplatePicker } from "../components/TemplatePicker";
+import { useInstallPrompt } from "../hooks/useInstallPrompt";
 
 export function HomePage() {
   const projects = useProjects();
   const navigate = useNavigate();
   const [showPicker, setShowPicker] = useState(false);
+  const { canInstall, install } = useInstallPrompt();
 
   return (
     <div className="px-4 pt-6">
-      <h1 className="text-2xl font-bold text-slate-800 mb-1">Projekt</h1>
-      <p className="text-sm text-slate-500 mb-6">Alla projekt</p>
+      <div className="flex items-start justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-800 mb-1">Projekt</h1>
+          <p className="text-sm text-slate-500">Alla projekt</p>
+        </div>
+        {canInstall && (
+          <button
+            onClick={install}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-wood-600 text-white text-sm font-medium active:bg-wood-700 transition-colors"
+          >
+            <Download size={16} />
+            Installera app
+          </button>
+        )}
+      </div>
 
       <div className="space-y-3">
         {projects.map((project) => {
