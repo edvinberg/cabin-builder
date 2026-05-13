@@ -1,4 +1,6 @@
 import { useSyncExternalStore } from "react";
+import { set, onValue } from "firebase/database";
+import { stateRef } from "./firebase";
 import type { Project, Phase, Material, Learning, LearningCategory } from "../types";
 import type { ProjectTemplate } from "./templates";
 
@@ -17,15 +19,33 @@ let projects: Project[] = saved?.projects ?? [];
 let learnings: Learning[] = saved?.learnings ?? [];
 let listeners: Set<() => void> = new Set();
 let nextId = saved?.nextId ?? 1000;
+let skipNextRemote = false;
 
 function id() {
   return `gen-${nextId++}`;
 }
 
 function emit() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify({ projects, learnings, nextId }));
+  const state = { projects, learnings, nextId };
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  skipNextRemote = true;
+  set(stateRef, state);
   listeners.forEach((l) => l());
 }
+
+onValue(stateRef, (snapshot) => {
+  if (skipNextRemote) {
+    skipNextRemote = false;
+    return;
+  }
+  const data = snapshot.val();
+  if (!data) return;
+  projects = data.projects ?? [];
+  learnings = data.learnings ?? [];
+  nextId = data.nextId ?? nextId;
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({ projects, learnings, nextId }));
+  listeners.forEach((l) => l());
+});
 
 function subscribe(listener: () => void) {
   listeners.add(listener);
