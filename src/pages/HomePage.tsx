@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ChevronRight, Trash2, Plus, Download } from "lucide-react";
+import { ChevronRight, Trash2, Plus, Download, Share, X } from "lucide-react";
 import { useProjects, deleteProject, updateProject, cycleProjectStatus } from "../data/store";
 import { StatusBadge } from "../components/StatusBadge";
 import { EditableText } from "../components/EditableText";
@@ -11,7 +11,7 @@ export function HomePage() {
   const projects = useProjects();
   const navigate = useNavigate();
   const [showPicker, setShowPicker] = useState(false);
-  const { canInstall, install } = useInstallPrompt();
+  const { canInstall, install, showIosBanner, dismissIos } = useInstallPrompt();
 
   return (
     <div className="px-4 pt-6">
@@ -30,6 +30,19 @@ export function HomePage() {
           </button>
         )}
       </div>
+
+      {showIosBanner && (
+        <div className="mb-4 p-3 rounded-xl bg-wood-50 border border-wood-200 flex items-start gap-3">
+          <Share size={20} className="text-wood-600 shrink-0 mt-0.5" />
+          <div className="flex-1 text-sm text-wood-800">
+            <p className="font-medium mb-0.5">Installera som app</p>
+            <p className="text-wood-600">Tryck <strong>Dela</strong> → <strong>"Lägg till på hemskärmen"</strong></p>
+          </div>
+          <button onClick={dismissIos} className="p-1 text-wood-400">
+            <X size={16} />
+          </button>
+        </div>
+      )}
 
       <div className="space-y-3">
         {projects.map((project) => {
