@@ -1,0 +1,32 @@
+@import "tailwindcss";
+
+@theme {
+  --color-wood-50: #faf6f1;
+  --color-wood-100: #f0e6d6;
+  --color-wood-200: #e0ccad;
+  --color-wood-300: #cead7e;
+  --color-wood-400: #be9058;
+  --color-wood-500: #b27b42;
+  --color-wood-600: #9a6337;
+  --color-wood-700: #7d4d2e;
+  --color-wood-800: #68402b;
+  --color-wood-900: #593727;
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@keyframes slide-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.25s ease-out;
+}
