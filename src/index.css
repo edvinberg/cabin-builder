@@ -13,7 +13,8 @@
   --color-wood-900: #593727;
 }
 
-body {
+html, body {
+  overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
